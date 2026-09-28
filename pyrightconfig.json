@@ -1,0 +1,19 @@
+{
+  "venvPath": ".",
+  "venv": "venv",
+  "extraPaths": [
+    "backend"
+  ],
+  "include": [
+    "backend",
+    "tests"
+  ],
+  "exclude": [
+    "venv",
+    "**/__pycache__",
+    "hardware"
+  ],
+  "reportMissingImports": "none",
+  "pythonVersion": "3.11",
+  "pythonPlatform": "Windows"
+}

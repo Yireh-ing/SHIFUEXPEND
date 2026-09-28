@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "IoTLogisticsTelemetryContract",
+  "description": "Contrato estricto de datos de telemetría y estado de inventario para el Sistema Logístico IoT con IA Multi-Agente",
+  "type": "object",
+  "required": [
+    "device_id",
+    "timestamp",
+    "sensor_data",
+    "inventory_state"
+  ],
+  "properties": {
+    "device_id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 64,
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "description": "Identificador único y alfanumérico del dispositivo IoT emisor"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp en formato estándar ISO-8601 (UTC)"
+    },
+    "sensor_data": {
+      "type": "object",
+      "description": "Datos de telemetría física capturados en el Edge por los sensores",
+      "required": [
+        "ir_status",
+        "item_count"
+      ],
+      "properties": {
+        "ir_status": {
+          "type": "integer",
+          "enum": [0, 1],
+          "description": "Estado del sensor infrarrojo: 0 para objeto detectado (activo-bajo), 1 para ausencia"
+        },
+        "item_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Conteo acumulado de ítems detectados por el dispositivo en el lote actual"
+        },
+        "sampling_rate_ms": {
+          "type": "integer",
+          "minimum": 10,
+          "default": 100,
+          "description": "Tasa de muestreo del sensor en milisegundos"
+        },
+        "rssi_dbm": {
+          "type": "number",
+          "description": "Intensidad de señal WiFi en dBm (para ESP32)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "inventory_state": {
+      "type": "object",
+      "description": "Estado operativo del inventario asociado al punto de control",
+      "required": [
+        "current_stock",
+        "backlog",
+        "reorder_point",
+        "expected_demand"
+      ],
+      "properties": {
+        "current_stock": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Unidades físicas disponibles en la ubicación del sensor"
+        },
+        "backlog": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Órdenes de clientes pendientes por surtir insatisfechas"
+        },
+        "reorder_point": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Nivel umbral de stock que dispara la alerta de reorden"
+        },
+        "expected_demand": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Pronóstico de demanda esperada para el siguiente ciclo"
+        },
+        "lead_time_days": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 3,
+          "description": "Tiempo de reabastecimiento en días del proveedor"
+        },
+        "safety_stock": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 10,
+          "description": "Stock de seguridad amortiguador contra variaciones de demanda"
+        }
+      },
+      "additionalProperties": false
+    },
+    "logistics_decision": {
+      "type": "object",
+      "description": "Metadatos generados por el motor InvAgent con razonamiento Chain-of-Thought",
+      "properties": {
+        "reasoning_cot": {
+          "type": "string",
+          "description": "Razonamiento conciso en 1-2 oraciones que fundamenta la acción tomada"
+        },
+        "open_orders": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Órdenes abiertas calculadas con la Regla de Oro (Demanda + Backlog)"
+        },
+        "recommended_order_qty": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Cantidad de pedido recomendada ajustada por capacidad y lead time"
+        },
+        "reorder_triggered": {
+          "type": "boolean",
+          "description": "Indica si se activó la alerta de reorden de inventario"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
